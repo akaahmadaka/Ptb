@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from typing import List, Dict, Optional, Union
 import user_referral_system as urs
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, Message
+from config import get_admin_user_id
 from telegram.ext import CommandHandler, CallbackContext, Application, MessageHandler, filters, CallbackQueryHandler
 from telegram.error import RetryAfter, Forbidden, TelegramError
 
@@ -16,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class BroadcastConfig:
-    ADMIN_USER_ID: int = 5250831809  # Replace with your admin ID
+    ADMIN_USER_ID: int = get_admin_user_id()
     MAX_RETRIES: int = 3
     RETRY_DELAY: float = 2.0
     RATE_LIMIT_DELAY: float = 0.05
@@ -393,6 +394,7 @@ async def handle_progress(update: Update, context: CallbackContext) -> None:
 
 def setup_broadcast_handler(application: Application) -> None:
     config = BroadcastConfig()
+    config.ADMIN_USER_ID = get_admin_user_id()
     manager = BroadcastManager(config)
     application.bot_data['broadcast_manager'] = manager
 
@@ -403,8 +405,8 @@ def setup_broadcast_handler(application: Application) -> None:
     application.add_handler(MessageHandler(
         # Modified filter to better handle broadcast messages
         filters.ALL & 
-        ~filters.COMMAND & 
-        filters.ChatType.PRIVATE & 
+        ~filters.COMMAND &
+        filters.ChatType.PRIVATE &
         filters.User(manager.config.ADMIN_USER_ID),
         receive_broadcast_message,
         # Add this handler with higher priority

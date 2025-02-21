@@ -1,10 +1,15 @@
+"""
+This module contains the implementation of the /top command, which displays the top 10 users with the most referrals.
+"""
 from telegram import Update
 from telegram.ext import ContextTypes
 import json
+from config import get_admin_user_id
 
-ADMIN_USER_ID = 5250831809  # Replace with your actual admin user ID
+ADMIN_USER_ID = get_admin_user_id()  # Use the admin user ID from config
 
 async def top(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handles the /top command to display the top 10 users with the most referrals."""
     user_id = update.effective_user.id
     if user_id != ADMIN_USER_ID:
         await update.message.reply_text("🚫 You are not authorized to use this command.")
